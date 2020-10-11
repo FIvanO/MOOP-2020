@@ -11,7 +11,7 @@ public class Manufacturer {
             throws Exception {
 
         String url = "jdbc:mysql://" + ip + ":" + port + "/" +
-                DBName + "?serverTimezone=Europe/Kiev&useSSL=FALSE";
+                DBName + "?serverTimezone=Europe/Kiev&useSSL=FALSE&allowPublicKeyRetrieval=true";
         con = DriverManager.getConnection(url, "admin", "Password_1");
         stmt = con.createStatement();
     }
@@ -36,16 +36,13 @@ public class Manufacturer {
         }
     }
 
-    public Calendar getManufacturerFoundationDate(int id) {
+    public String getManufacturerFoundationDate(int id) {
         String sql = "SELECT FoundationDate FROM Manufacturer WHERE ID = " + id;
-        Calendar calendar = new GregorianCalendar();
         try {
             ResultSet rs = stmt.executeQuery(sql);
             while (rs.next()) {
                 Date foundation = rs.getDate("FoundationDate");
-                System.out.println("Date = " + foundation.toString());
-                calendar.setTime(foundation);
-                System.out.println(calendar.get(Calendar.YEAR) + "-" + calendar.get(Calendar.MONTH) + '-' + calendar.get(Calendar.DAY_OF_MONTH));
+                return foundation.toString();
             }
             rs.close();
         } catch (SQLException e) {
@@ -54,7 +51,7 @@ public class Manufacturer {
             System.out.println(" >> " + e.getMessage());
         }
 
-        return calendar;
+        return "1970-01-01";
     }
 
     // stop work
@@ -94,30 +91,13 @@ public class Manufacturer {
         }
     }
 
-    public boolean updateManufacturer(int id, String name, Calendar foundation_date) {
-        int month = foundation_date.get(Calendar.MONTH);
-        String month_q;
-        if (month < 10) {
-            month_q = "0" + String.valueOf(month);
-        } else {
-            month_q = String.valueOf(month);
-        }
-
-        int day = foundation_date.get(Calendar.DAY_OF_MONTH);
-        String day_q;
-        if (day < 10) {
-            day_q = "0" + String.valueOf(day);
-        } else {
-            day_q = String.valueOf(day);
-        }
-
+    public boolean updateManufacturer(int id, String name, String foundation_date) {
         String sql;
         if (name.equals("")) {
-            sql = "UPDATE Manufacturer SET FoundationDate = '" +
-                    foundation_date.get(Calendar.YEAR) + '-' + month_q + '-' + day_q + "' WHERE ID = " + id;
+            sql = "UPDATE Manufacturer SET FoundationDate = '" + foundation_date + "' WHERE ID = " + id;
         } else {
             sql = "UPDATE Manufacturer SET Name = '" + name + "', FoundationDate = '" +
-                    foundation_date.get(Calendar.YEAR) + '-' + month_q + '-' + day_q + "' WHERE ID = " + id;
+                    foundation_date + "' WHERE ID = " + id;
         }
         try {
             stmt.executeUpdate(sql);
@@ -158,69 +138,96 @@ public class Manufacturer {
 
         Scanner in = new Scanner(System.in);
 
-        Calendar calendar = new GregorianCalendar(1920, 1, 30);
-        m.addManufacturer("Mazda", calendar);
-        calendar = new GregorianCalendar(1997, 3, 18);
-        m.addManufacturer("Cherry", calendar);
+        // add manufacturers
+        {
+            System.out.println("Do You want to add manufacturers (y/n)?");
+            String add = in.nextLine();
+            if (add.equals("y")) {
+                Calendar calendar = new GregorianCalendar(1920, 1, 30);
+                m.addManufacturer("Mazda", calendar);
+                calendar = new GregorianCalendar(1997, 3, 18);
+                m.addManufacturer("Cherry", calendar);
 
-        m.showManufacturers();
+                m.showManufacturers();
+            }
+        }
 
-        System.out.println("Do You want to update manufacturers (y/n)?");
-        String s = in.nextLine();
-        if (s.equals("y")) {
-            System.out.println("How much manufacturers you want to update?");
-            int count_to_update = in.nextInt();
+        // update manufacturers
+        {
+            System.out.println("Do You want to update manufacturers (y/n)?");
+            String s = in.nextLine();
+            if (s.equals("y")) {
+                System.out.println("How much manufacturers you want to update?");
+                int count_to_update = in.nextInt();
 
-            for (int i = 0; i < count_to_update; ++i) {
-                System.out.println("Enter manufacturer id: ");
-                int id = in.nextInt();
+                for (int i = 0; i < count_to_update; ++i) {
+                    System.out.println("Enter manufacturer id: ");
+                    int id = in.nextInt();
 
-                System.out.println("Enter manufacturer new name (0 - for do not change name): ");
-                String name = in.next();
+                    System.out.println("Enter manufacturer new name (0 - for do not change name): ");
+                    String name = in.next();
 
-                if (name.equals("0")) {
-                    name = new String();
+                    if (name.equals("0")) {
+                        name = new String();
+                    }
+
+                    String date;
+                    int year, month, day;
+                    System.out.println("Do You want to set new foundation date (y/n): ");
+                    String q = in.next();
+                    if (q.equals("y")) {
+                        System.out.println("Enter new foundation year: ");
+                        year = in.nextInt();
+
+                        System.out.println("Enter new foundation month: ");
+                        month = in.nextInt();
+
+                        System.out.println("Enter new foundation day: ");
+                        day = in.nextInt();
+
+                        String month_q;
+                        if (month < 10) {
+                            month_q = "0" + String.valueOf(month);
+                        } else {
+                            month_q = String.valueOf(month);
+                        }
+
+                        String day_q;
+                        if (day < 10) {
+                            day_q = "0" + String.valueOf(day);
+                        } else {
+                            day_q = String.valueOf(day);
+                        }
+
+                        date = String.valueOf(year) + '-' + month_q + '-' + day_q;
+                    } else {
+                        date = m.getManufacturerFoundationDate(id);
+                    }
+
+                    m.updateManufacturer(id, name, date);
                 }
 
-                Calendar calendar1 = new GregorianCalendar();
-                int year, month, day;
-                System.out.println("Do You want to set new foundation date (y/n): ");
-                String q = in.next();
-                if (q.equals("y")) {
-                    System.out.println("Enter new foundation year: ");
-                    year = in.nextInt();
+                m.showManufacturers();
+            }
+        }
 
-                    System.out.println("Enter new foundation month: ");
-                    month = in.nextInt();
+        // delete manufacturers
+        {
+            System.out.println("How much manufacturers you want to delete?");
+            int count_to_delete = in.nextInt();
 
-                    System.out.println("Enter new foundation day: ");
-                    day = in.nextInt();
+            if (count_to_delete != 0) {
+                System.out.println("Which " + count_to_delete + " manufacturers you want to delete (id)?");
+            }
 
-                    calendar1.set(year, month, day);
-                } else {
-                    calendar1 = m.getManufacturerFoundationDate(id);
-                }
-
-                m.updateManufacturer(id, name, calendar1);
-
+            for (int i = 0; i < count_to_delete; ++i) {
+                int man_id = in.nextInt();
+                m.deleteManufacturer(man_id);
             }
 
             m.showManufacturers();
         }
 
-        System.out.println("How much manufacturers you want to delete?");
-        int count_to_delete = in.nextInt();
-
-        if (count_to_delete != 0) {
-            System.out.println("Which " + count_to_delete + " manufacturers you want to delete (id)?");
-        }
-
-        for (int i = 0; i < count_to_delete; ++i) {
-            int man_id = in.nextInt();
-            m.deleteManufacturer(man_id);
-        }
-
-        m.showManufacturers();
         m.stop();
     }
 }
