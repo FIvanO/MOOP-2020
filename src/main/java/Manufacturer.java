@@ -1,12 +1,11 @@
 import java.sql. *;
 import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.Scanner;
 
 public class Manufacturer {
-    private final Connection con; // з'єднання з БД
-    private final Statement stmt; // оператор
-    // Конструктор
+    private final Connection con; // connection to db
+    private final Statement stmt; // operator
+
+    // constructor
     public Manufacturer(String DBName, String ip, int port)
             throws Exception {
 
@@ -130,7 +129,6 @@ public class Manufacturer {
         }
     }
 
-    // test scenario
     public static void main(String[] args) throws Exception {
     }
 }

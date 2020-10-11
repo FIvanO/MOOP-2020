@@ -9,7 +9,7 @@ public class JavaToMySql {
         System.out.println("Group BI-1");
         System.out.println("Lab 2, Variant 5: Car Showroom");
         System.out.println("");
-        
+
         runTests();
     }
 

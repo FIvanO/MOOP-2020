@@ -1,10 +1,10 @@
 import java.sql. *;
-import java.util.Scanner;
 
 public class Model {
-    private final Connection con; // з'єднання з БД
-    private final Statement stmt; // оператор
-    // Конструктор
+    private final Connection con; // connection to db
+    private final Statement stmt; // operator
+
+    // constructor
     public Model(String DBName, String ip, int port)
             throws Exception {
 
@@ -100,7 +100,6 @@ public class Model {
         }
     }
 
-
     // delete model
     public boolean deleteModel(int id) {
         String sql = "DELETE FROM Model WHERE ID =" + id;
@@ -121,7 +120,6 @@ public class Model {
         }
     }
 
-    // test scenario
     public static void main(String[] args) throws Exception {
     }
 }
