@@ -157,7 +157,7 @@ public class Manufacturer {
             System.out.println("Do You want to update manufacturers (y/n)?");
             String s = in.nextLine();
             if (s.equals("y")) {
-                System.out.println("How much manufacturers you want to update?");
+                System.out.println("How many manufacturers you want to update?");
                 int count_to_update = in.nextInt();
 
                 for (int i = 0; i < count_to_update; ++i) {
@@ -213,7 +213,7 @@ public class Manufacturer {
 
         // delete manufacturers
         {
-            System.out.println("How much manufacturers you want to delete?");
+            System.out.println("How many manufacturers you want to delete?");
             int count_to_delete = in.nextInt();
 
             if (count_to_delete != 0) {
