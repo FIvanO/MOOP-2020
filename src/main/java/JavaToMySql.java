@@ -1,47 +1,209 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.Scanner;
 
 public class JavaToMySql {
-    // JDBC URL, username and password of MySQL server
-    private static final String url = "jdbc:mysql://localhost:3306/CarShowroom?serverTimezone=Europe/Kiev&useSSL=FALSE";
-    private static final String user = "admin";
-    private static final String password = "Password_1";
 
-    // JDBC variables for opening and managing connection
-    private static Connection con;
-    private static Statement stmt;
-    private static ResultSet rs;
-
-    public static void main(String[] args) {
-        String query = "select count(*) from Model";
-
-        try {
-            // opening database connection to MySQL server
-            con = DriverManager.getConnection(url, user, password);
-
-            // getting Statement object to execute query
-            stmt = con.createStatement();
-
-            // executing SELECT query
-            rs = stmt.executeQuery(query);
-
-            while (rs.next()) {
-                int count = rs.getInt(1);
-                System.out.println("Total number of cars: " + count);
-            }
-
-        } catch (SQLException sqlEx) {
-            sqlEx.printStackTrace();
-        } finally {
-            //close connection ,stmt and result set here
-            try { con.close(); } catch(SQLException se) { /*can't do anything */ }
-            try { stmt.close(); } catch(SQLException se) { /*can't do anything */ }
-            try { rs.close(); } catch(SQLException se) { /*can't do anything */ }
-        }
+    public static void main(String[] args) throws Exception {
+        System.out.println("Made by Franchuk I.");
+        System.out.println("Group BI-1");
+        System.out.println("Lab 2, Variant 5: Car Showroom");
+        System.out.println("");
+        
+        runTests();
     }
 
+    public static void runTests() throws Exception {
+        System.out.println("Start testing manufacturers");
+        testManufacturers();
+        System.out.println("");
+
+        System.out.println("Start testing models");
+        testModels();
+    }
+
+    public static void testModels() throws Exception {
+        Model m = new Model("CarShowroom", "localhost", 3306);
+        m.showModels();
+        System.out.println("");
+
+        Scanner in = new Scanner(System.in);
+
+        // add models
+        {
+            System.out.println("Do You want to add models (y/n)?");
+            String add = in.nextLine();
+
+            if (add.equals("y")) {
+                m.addModel("EC8", 14, 4, 2020, 18, 1);
+                m.addModel("i50", 3, 1, 2020, 12, 3);
+
+                m.showModels();
+                System.out.println("");
+
+            }
+        }
+
+        // update models
+        {
+            System.out.println("Do You want to update models (y/n)?");
+            String s = in.nextLine();
+            if (s.equals("y")) {
+                System.out.println("How many models you want to update?");
+                int count_to_update = in.nextInt();
+
+                for (int i = 0; i < count_to_update; ++i) {
+                    System.out.println("Enter model id: ");
+                    int id = in.nextInt();
+
+                    System.out.println("Enter model`s new name (0 - for do not change name): ");
+                    String name = in.next();
+
+                    if (name.equals("0")) {
+                        name = new String();
+                    }
+
+                    int manufacturer_id = 0, color_id = 0, year = 0, engine_capacity = 0, count = 0;
+
+                    System.out.println("Enter new ManufacturerID (0 - for do not change): ");
+                    manufacturer_id = in.nextInt();
+
+                    System.out.println("Enter new ColorID (0 - for do not change): ");
+                    color_id = in.nextInt();
+
+                    System.out.println("Enter new Year (0 - for do not change): ");
+                    year = in.nextInt();
+
+                    System.out.println("Enter new EngineCapacity (0 - for do not change): ");
+                    engine_capacity = in.nextInt();
+
+                    System.out.println("Enter new Count ('-1' - for do not change): ");
+                    count = in.nextInt();
+
+                    m.updateModel(id, name, manufacturer_id, color_id, year, engine_capacity, count);
+                }
+
+                m.showModels();
+                System.out.println("");
+            }
+        }
+
+        // delete models
+        {
+            System.out.println("How many models you want to delete?");
+            int count_to_delete = in.nextInt();
+
+            if (count_to_delete != 0) {
+                System.out.println("Which " + count_to_delete + " models you want to delete (id)?");
+            }
+
+            for (int i = 0; i < count_to_delete; ++i) {
+                int model_id = in.nextInt();
+                m.deleteModel(model_id);
+            }
+        }
+
+        m.showModels();
+        m.stop();
+    }
+
+    public static void testManufacturers() throws Exception {
+        Manufacturer m = new Manufacturer("CarShowroom", "localhost", 3306);
+        m.showManufacturers();
+        System.out.println("");
+
+        Scanner in = new Scanner(System.in);
+
+        // add manufacturers
+        {
+            System.out.println("Do You want to add manufacturers (y/n)?");
+            String add = in.nextLine();
+            if (add.equals("y")) {
+                Calendar calendar = new GregorianCalendar(1920, 1, 30);
+                m.addManufacturer("Mazda", calendar);
+                calendar = new GregorianCalendar(1997, 3, 18);
+                m.addManufacturer("Cherry", calendar);
+
+                m.showManufacturers();
+            }
+        }
+
+        // update manufacturers
+        {
+            System.out.println("Do You want to update manufacturers (y/n)?");
+            String s = in.nextLine();
+            if (s.equals("y")) {
+                System.out.println("How many manufacturers you want to update?");
+                int count_to_update = in.nextInt();
+
+                for (int i = 0; i < count_to_update; ++i) {
+                    System.out.println("Enter manufacturer id: ");
+                    int id = in.nextInt();
+
+                    System.out.println("Enter manufacturer new name (0 - for do not change name): ");
+                    String name = in.next();
+
+                    if (name.equals("0")) {
+                        name = new String();
+                    }
+
+                    String date;
+                    int year, month, day;
+                    System.out.println("Do You want to set new foundation date (y/n): ");
+                    String q = in.next();
+                    if (q.equals("y")) {
+                        System.out.println("Enter new foundation year: ");
+                        year = in.nextInt();
+
+                        System.out.println("Enter new foundation month: ");
+                        month = in.nextInt();
+
+                        System.out.println("Enter new foundation day: ");
+                        day = in.nextInt();
+
+                        String month_q;
+                        if (month < 10) {
+                            month_q = "0" + String.valueOf(month);
+                        } else {
+                            month_q = String.valueOf(month);
+                        }
+
+                        String day_q;
+                        if (day < 10) {
+                            day_q = "0" + String.valueOf(day);
+                        } else {
+                            day_q = String.valueOf(day);
+                        }
+
+                        date = String.valueOf(year) + '-' + month_q + '-' + day_q;
+                    } else {
+                        date = m.getManufacturerFoundationDate(id);
+                    }
+
+                    m.updateManufacturer(id, name, date);
+                }
+
+                m.showManufacturers();
+            }
+        }
+
+        // delete manufacturers
+        {
+            System.out.println("How many manufacturers you want to delete?");
+            int count_to_delete = in.nextInt();
+
+            if (count_to_delete != 0) {
+                System.out.println("Which " + count_to_delete + " manufacturers you want to delete (id)?");
+            }
+
+            for (int i = 0; i < count_to_delete; ++i) {
+                int man_id = in.nextInt();
+                m.deleteManufacturer(man_id);
+            }
+
+            m.showManufacturers();
+        }
+
+        m.stop();
+    }
 }
