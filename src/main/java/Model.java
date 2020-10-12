@@ -40,6 +40,33 @@ public class Model {
         }
     }
 
+    // models by manufacturer ID
+    public void findModelsByManID(int manufacturer_id) {
+        String sql = "SELECT ID, Name, ManufacturerID, ColorID, Year, EngineCapacity, Count FROM Model " +
+                "WHERE ManufacturerID = " + manufacturer_id;
+        try {
+            ResultSet rs = stmt.executeQuery(sql);
+            System.out.println("Cars list:");
+            System.out.println("ID - Name - ManufacturerID - ColorID - Year - EngineCapacity - Count");
+            while (rs.next()) {
+                int id = rs.getInt("ID");
+                String name = rs.getString("Name");
+                int man_id = rs.getInt("ManufacturerID");
+                int col_id = rs.getInt("ColorID");
+                int year = rs.getInt("Year");
+                int eng_cap = rs.getInt("EngineCapacity");
+                int count = rs.getInt("Count");
+                System.out.println(">>" + id + " - " + name + " - " + man_id + " - " + col_id + " - " + year +
+                        " - " + eng_cap + " - " + count);
+            }
+            rs.close();
+        } catch (SQLException e) {
+            System.out.println(
+                    "ERROR while getting auto's list");
+            System.out.println(" >> " + e.getMessage());
+        }
+    }
+
     // stop work
     public void stop() throws SQLException {
         con.close();

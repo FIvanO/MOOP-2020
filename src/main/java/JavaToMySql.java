@@ -29,10 +29,33 @@ public class JavaToMySql {
 
         Scanner in = new Scanner(System.in);
 
+        // find models by manufacturer id
+        {
+            System.out.println("Do You want to find models by manufacturer id (y/n)?");
+            String find = in.next();
+
+            if (find.equals("y")) {
+                System.out.println("Do You want to see list of manufacturers (y/n)?");
+                String ans = in.next();
+
+                if (ans.equals("y")) {
+                    Manufacturer manufacturer = new Manufacturer("CarShowroom", "localhost", 3306);
+                    manufacturer.showManufacturers();
+                    System.out.println("");
+                }
+
+                System.out.println("Enter manufacturer id: ");
+                int man_id = in.nextInt();
+
+                m.findModelsByManID(man_id);
+                System.out.println("");
+            }
+        }
+
         // add models
         {
             System.out.println("Do You want to add models (y/n)?");
-            String add = in.nextLine();
+            String add = in.next();
 
             if (add.equals("y")) {
                 m.addModel("EC8", 14, 4, 2020, 18, 1);
@@ -47,7 +70,7 @@ public class JavaToMySql {
         // update models
         {
             System.out.println("Do You want to update models (y/n)?");
-            String s = in.nextLine();
+            String s = in.next();
             if (s.equals("y")) {
                 System.out.println("How many models you want to update?");
                 int count_to_update = in.nextInt();
